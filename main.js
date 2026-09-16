@@ -3,7 +3,7 @@ function atAutocomplete(elId, url, delay = 300) {
         $.getJSON(url, data, fn)
     }, delay)
 
-    const $valEl = $(`#${elId}`);
+    const $cb = $(`#${elId}`);
     const html = `
         <div class="ac-container">
             <input class="form-control" id="${elId}-filter" role="combobox" aria-controls="${elId}-dropdow" aria-expanded="false" aria-autocomplete="list">
@@ -11,7 +11,7 @@ function atAutocomplete(elId, url, delay = 300) {
                 <li class="dropdown-item" role="option"></li>
             </ul>
         </div>`
-    $valEl.after(html);
+    $cb.after(html);
 
     const $filter = $(`#${elId}-filter`);
     const $ddm = $(`#${elId}-dropdown`);
@@ -28,8 +28,8 @@ function atAutocomplete(elId, url, delay = 300) {
             return;
         }
 
-        $valEl.html(
-            `<option value="${parseInt($el.attr('data-id'))}" selected></option>`
+        $cb.html(
+            `<option value="${parseInt($el.data('id'))}" selected></option>`
         );
 
         $el.addClass('selected');
@@ -46,7 +46,7 @@ function atAutocomplete(elId, url, delay = 300) {
 
     function handleApiData(data) {
         $ddm.html('');
-        $valEl.html('');
+        $cb.html('');
         $selectedEl = null;
 
         if (data.length === 0) {
@@ -65,7 +65,7 @@ function atAutocomplete(elId, url, delay = 300) {
                     id: 'ac-option-' + idx,
                     'aria-selected': 'false',
                 })
-                .text(val.name)
+                .text(val.label)
                 .appendTo($ddm)
         });
 
@@ -78,20 +78,21 @@ function atAutocomplete(elId, url, delay = 300) {
         if (this !== $ddm[0]) $ddm.attr('hidden', true);
     })
 
-    $ddm.on('click', '.dropdown-item', function () {
+    $('.ac-container')
+        .on('click', `#${elId}-dropdown .dropdown-item`, function () {
         selectItem($(this));
     });
 
-    $filter.on('input', function () {
+    $('.ac-container').on('input', `#${elId}-filter`, function () {
         if (this.value.length < 3) return;
         fetchData(url, { term: this.value }, handleApiData);
     });
 
-    $filter.on('keyup', function (e) {
+    $('.ac-container').on('keyup', `#${elId}-filter`, function (e) {
         if (e.key === 'ArrowDown' && $menuItems.length) {
             $ddm.removeAttr('hidden');
             if ($selectedEl) {
-                const idx = parseInt($selectedEl.attr('data-idx'));
+                const idx = parseInt($selectedEl.data('idx'));
                 if ($menuItems.length - 1 > idx) {
                     $menuItems.eq(idx + 1).trigger('focus');
                 } else {
@@ -104,11 +105,10 @@ function atAutocomplete(elId, url, delay = 300) {
         }
     })
 
-    $ddm.on('keyup', '.dropdown-item', function (e) {
+    $('.ac-container')
+        .on('keyup', `#${elId}-dropdown .dropdown-item`, function (e) {
         if (e.key === 'ArrowDown') {
-            const idx = parseInt(
-                $ddm.find('.dropdown-item:focus').attr('data-idx')
-            );
+            const idx = parseInt($ddm.find('.dropdown-item:focus').data('idx'));
             if ($menuItems.length - 1 > idx) {
                 $menuItems.eq(idx + 1).trigger('focus')
                 $filter.attr('aria-activedescendant', `ac-option-${idx + 1}`);
@@ -118,9 +118,7 @@ function atAutocomplete(elId, url, delay = 300) {
             }
         }
         if (e.key === 'ArrowUp') {
-            const idx = parseInt(
-                $ddm.find('.dropdown-item:focus').attr('data-idx')
-            );
+            const idx = parseInt($ddm.find('.dropdown-item:focus').data('idx'));
             if (idx > 0) {
                 $menuItems.eq(idx - 1).trigger('focus')
                 $filter.attr('aria-activedescendant', `ac-option-${idx - 1}`);

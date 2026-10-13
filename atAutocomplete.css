@@ -14,6 +14,7 @@
 .ac-container .dropdown-item {
     cursor: default;
     padding: 0.25rem 0.5rem;
+	background-color: #ffffff;
 }
 
 .ac-container .dropdown-item:first-of-type {

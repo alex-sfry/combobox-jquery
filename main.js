@@ -1,4 +1,9 @@
-function atAutocomplete(elId, url, delay = 300) {
+/**
+ * @param {string} elId ID of hidden input element which will be submitted with selected value
+ * @param {string} url API url
+ * @param {integer} delay Debouce delay
+ */
+export default function atAutocomplete(elId, url, delay = 300) {
     const fetchData = _.debounce(function (url, data, fn) {
         $.getJSON(url, data, fn)
     }, delay)
@@ -132,8 +137,4 @@ function atAutocomplete(elId, url, delay = 300) {
         }
         if (e.key === 'Enter') selectItem($(this))
     })
-}
-
-if (document.getElementById('ac')) {
-    atAutocomplete('name', './data.json');
 }
